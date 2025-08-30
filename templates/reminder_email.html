@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Renewal Reminder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .alert-box.danger {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        .service-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .service-info h3 {
+            margin-top: 0;
+            color: #6a11cb;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            color: white;
+        }
+        .days-left {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #dc3545;
+        }
+        .days-left.safe {
+            color: #28a745;
+        }
+        .days-left.warning {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Subscription Renewal Reminder</h1>
+            <p>Action Required to Continue Your Service</p>
+        </div>
+        
+        <div class="content">
+            <div class="service-info">
+                <h3>{{ service }}</h3>
+                <p>Your subscription is expiring soon. Please take action to continue enjoying uninterrupted service.</p>
+                
+                <div class="days-left {% if days_left <= 3 %}danger{% elif days_left <= 7 %}warning{% else %}safe{% endif %}">
+                    {{ days_left }} DAYS LEFT
+                </div>
+                
+                <div class="alert-box {% if days_left <= 3 %}danger{% endif %}">
+                    <strong>{{ message }}</strong>
+                </div>
+                
+                <p>If you don't renew your subscription, you'll lose access to all premium features and content.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ renewal_link }}" class="btn">Renew Subscription Now</a>
+            </div>
+            
+            <p>If you have any questions about your subscription or need help with the renewal process, please contact our support team.</p>
+            
+            <p>Thank you for being a valued customer!</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2023 Subscription Reminder System. All rights reserved.</p>
+            <p>
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> | 
+                <a href="#">Contact Support</a>
+            </p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

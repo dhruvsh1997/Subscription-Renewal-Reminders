@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Reminder Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .expiry-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .expiry-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .expiry-safe {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .btn-action {
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-renew {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        .btn-renew:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            transform: scale(1.05);
+        }
+        .btn-cancel {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            transform: scale(1.05);
+        }
+        .service-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #6a11cb;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold mb-0">Subscription Reminder Dashboard</h1>
+                    <p class="lead mb-0">Manage your subscriptions and never miss a renewal</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex align-items-center justify-content-end">
+                        <i class="bi bi-bell-fill fs-1 me-3"></i>
+                        <div>
+                            <div class="fw-bold">Active Subscriptions</div>
+                            <div class="fs-3" id="active-count">{{ subscriptions|selectattr('status', 'equalto', 'active')|list|length }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        {% if subscriptions %}
+            <div class="row">
+                {% for sub in subscriptions %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center">
+                                <i class="bi bi-{{ sub.service.lower().replace(' ', '-') }} service-icon"></i>
+                                <div>
+                                    <h5 class="mb-0">{{ sub.service }}</h5>
+                                    <small class="text-muted">{{ sub.email }}</small>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <span class="status-badge {{ 'status-active' if sub.status == 'active' else 'status-cancelled' }}">
+                                            {{ sub.status|title }}
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="text-muted small">Expires</div>
+                                        <div class="fw-bold">{{ sub.expiry }}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div>
+                                        <div class="text-muted small">Days Left</div>
+                                        <div class="fw-bold {{ 
+                                            'expiry-danger' if sub.days_left <= 3 else 
+                                            'expiry-warning' if sub.days_left <= 7 else 
+                                            'expiry-safe' 
+                                        }}">
+                                            {{ sub.days_left }} days
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% if sub.days_left <= 7 %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Renewal Needed
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if sub.status == 'active' %}
+                                    <div class="d-grid gap-2">
+                                        <form action="{{ url_for('renew_subscription', user_id=sub.user_id) }}" method="post">
+                                            <button type="submit" class="btn btn-action btn-renew w-100">
+                                                <i class="bi bi-arrow-clockwise me-2"></i> Renew Subscription
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('cancel_subscription', user_id=sub.user_id) }}" method="post">
+                                            <button type="submit" class="btn btn-action btn-cancel w-100">
+                                                <i class="bi bi-x-circle me-2"></i> Cancel Subscription
+                                            </button>
+                                        </form>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-3">
+                                        <i class="bi bi-x-circle-fill text-danger fs-1"></i>
+                                        <p class="mt-2 mb-0">This subscription has been cancelled</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h3>No Subscriptions Found</h3>
+                <p>You don't have any active subscriptions at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Subscription Reminder System</h5>
+                    <p>Never miss a renewal with our AI-powered reminder system.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50">Dashboard</a></li>
+                        <li><a href="#" class="text-white-50">Settings</a></li>
+                        <li><a href="#" class="text-white-50">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled text-white-50">
+                        <li><i class="bi bi-envelope me-2"></i> support@reminder.com</li>
+                        <li><i class="bi bi-telephone me-2"></i> (123) 456-7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-white-50">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Subscription Reminder System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh dashboard every 30 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
