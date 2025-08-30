@@ -250,7 +250,7 @@ SubscriptionRenewalReminders/
 ### DevOps & Deployment
 - **Docker**: Containerization for consistent deployment
 - **GitHub Actions**: Automated CI/CD pipeline
-- **Gunicorn**: Production WSGI server
+- **Gunicorn**: Production WSGI servers
 
 ## 🎨 Key Code Concepts
 
